@@ -99,8 +99,9 @@ class _SignInPageState extends State<SignInPage> {
                       : const Text('Entrar'),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     const Text('Ainda não possui uma conta?'),
                     TextButton(
