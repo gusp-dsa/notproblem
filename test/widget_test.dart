@@ -53,6 +53,28 @@ void main() {
     expect(find.text('Registrar atraso'), findsOneWidget);
   });
 
+  testWidgets('login sem e-mail confirmado permanece na pagina de entrada',
+      (tester) async {
+    final repository = FakeAuthRepository(
+      signInError: StateError('Email not confirmed'),
+    );
+    await tester.pumpWidget(AgileKnowledgeApp(authRepository: repository));
+
+    await tester.enterText(
+      find.byKey(const Key('signInEmail')),
+      'pendente@exemplo.com',
+    );
+    await tester.enterText(
+      find.byKey(const Key('signInPassword')),
+      'Senha123',
+    );
+    await tester.tap(find.byKey(const Key('signInSubmit')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Confirme seu e-mail antes de entrar.'), findsOneWidget);
+    expect(find.text('Registrar atraso'), findsNothing);
+  });
+
   testWidgets('logout remove a sessão e volta para a página de entrada',
       (tester) async {
     final repository = FakeAuthRepository(
@@ -122,9 +144,11 @@ void main() {
 }
 
 class FakeAuthRepository implements AuthRepository {
-  FakeAuthRepository({AppUser? initialUser}) : _currentUser = initialUser;
+  FakeAuthRepository({AppUser? initialUser, this.signInError})
+      : _currentUser = initialUser;
 
   final _controller = StreamController<AppUser?>.broadcast();
+  final Object? signInError;
   AppUser? _currentUser;
 
   @override
@@ -135,6 +159,7 @@ class FakeAuthRepository implements AuthRepository {
 
   @override
   Future<void> signIn({required String email, required String password}) async {
+    if (signInError case final error?) throw error;
     _currentUser = AppUser(id: 'user-1', name: 'Gustavo', email: email);
     _controller.add(_currentUser);
   }
