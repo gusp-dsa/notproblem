@@ -39,7 +39,10 @@ class _AgileKnowledgeAppState extends State<AgileKnowledgeApp> {
       _authController = AuthController(repository);
     } else if (AppConfig.hasSupabaseCredentials) {
       _authController = AuthController(
-        SupabaseAuthRepository(Supabase.instance.client),
+        SupabaseAuthRepository(
+          Supabase.instance.client,
+          emailRedirectTo: AppConfig.emailConfirmationRedirectUrl,
+        ),
       );
     }
   }
